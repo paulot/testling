@@ -26,6 +26,8 @@
           str += divFromData(data.subviews[i]);
         }
 
+        console.log(data.id);
+
         return makeDiv(data.x, data.y, data.width, data.height, data.id) + str + '</div>';
       }
 
@@ -34,7 +36,10 @@
         var fileReader = new FileReader();
 
         fileReader.onload = function(ofrEvent) {
-          document.getElementById('preview').src = 'data:image/png;base64,' + btoa(ofrEvent.target.result);
+          var styleTag = '<style>#' + data.id + '{ background-image: url("' +
+            'data:image/png;base64,' + btoa(ofrEvent.target.result) + '")}</style>';
+
+          document.getElementById('styles').innerHTML += styleTag;
         }
         fileReader.readAsText(blob, 'utf-8');
       }
@@ -51,6 +56,6 @@
   <body id='body'>
     <div id='outline'></div>
 
-    <img id='preview'>
+    <div id='styles'></div>
   </body>
 </html>
