@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script>
+
+      function get(url, callback) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+          if (xmlHttp.readyState == 4 && xmlHttp.status == 200 && callback)
+            callback(JSON.parse(xmlHttp.responseText));
+
+        };
+        xmlHttp.open('GET', url, true);
+        xmlHttp.send(null);
+      }
+
+      function makeDiv(x, y, width, height, id) {
+        return '<div style="position:absolute; left: ' + x + ';top:' +
+          y + ';width:' + width + ';height:' + height +
+          ';" id="' + id + '" >';
+      }
+
+      function divFromData(data) {
+        var str = '';
+
+        for (var i = 0; i < data.subviews.length; i++) {
+          str += divFromData(data.subviews[i]);
+        }
+
+        return makeDiv(data.x, data.y, data.width, data.height, data.id) + str + '</div>';
+      }
+
+      function setImagePreview(data) {
+        var blob = new Blob([window.atob(data.image)], {type: 'image/png', encoding: 'utf-8'});
+        var fileReader = new FileReader();
+
+        fileReader.onload = function(ofrEvent) {
+          document.getElementById('preview').src = 'data:image/png;base64,' + btoa(ofrEvent.target.result);
+        }
+        fileReader.readAsText(blob, 'utf-8');
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        get('http://localhost:3000/data', function(data) {
+          document.getElementById('outline').innerHTML = divFromData(data);        
+          setImagePreview(data);
+        });
+      });
+
+    </script>
+  </head>
+  <body id='body'>
+    <div id='outline'></div>
+
+    <img id='preview'>
+  </body>
+</html>
